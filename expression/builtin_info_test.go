@@ -18,6 +18,7 @@ import (
 	"github.com/pingcap/tidb/ast"
 	"github.com/pingcap/tidb/mysql"
 	"github.com/pingcap/tidb/util/mock"
+	"github.com/pingcap/tidb/util/printer"
 	"github.com/pingcap/tidb/util/testleak"
 	"github.com/pingcap/tidb/util/types"
 )
@@ -110,4 +111,14 @@ func (s *testEvaluatorSuite) TestVersion(c *C) {
 	v, err := f.eval(nil)
 	c.Assert(err, IsNil)
 	c.Assert(v.GetString(), Equals, mysql.ServerVersion)
+}
+
+// Test case for tidb_server().
+func (s *testEvaluatorSuite) TestTiDBVersion(c *C) {
+	defer testleak.AfterTest(c)()
+	f, err := newFunctionForTest(s.ctx, ast.TiDBVersion, primitiveValsToConstants([]interface{}{})...)
+	c.Assert(err, IsNil)
+	v, err := f.Eval(nil)
+	c.Assert(err, IsNil)
+	c.Assert(v.GetString(), Equals, printer.GetTiDBInfo())
 }
